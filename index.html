@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f7c7d9" />
+  <title>Sayure TV</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">Sayure <span>TV</span></div>
+    <button id="langBtn" class="pill">PT</button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">SUA LISTA, DO SEU JEITO</p>
+      <h1>Filmes, séries e animes.<br><span>Sem perder onde parou.</span></h1>
+      <p>Organize o que está assistindo e continue exatamente do último episódio.</p>
+    </section>
+
+    <section class="search-wrap">
+      <input id="search" type="search" placeholder="Buscar título..." autocomplete="off" />
+      <div id="results" class="results"></div>
+    </section>
+
+    <section>
+      <div class="section-title"><h2>Minha lista</h2><span id="count">0 títulos</span></div>
+      <div id="watchlist" class="grid"></div>
+      <div id="empty" class="empty">
+        <div class="heart">♡</div>
+        <h3>Sua lista está vazia</h3>
+        <p>Busque uma série, filme ou anime acima para começar.</p>
+      </div>
+    </section>
+  </main>
+
+  <nav>
+    <button class="active">⌂<small>Início</small></button>
+    <button onclick="document.getElementById('search').focus()">⌕<small>Buscar</small></button>
+    <button>♡<small>Minha lista</small></button>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html>
