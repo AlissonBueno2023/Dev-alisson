@@ -1,0 +1,39 @@
+(()=>{
+'use strict';
+const Q={
+'game of thrones':[
+['Qual família tem o lema “Winter is Coming”?',['Stark','Lannister','Tyrell','Targaryen'],0],
+['Quem é conhecido como “The Imp”?',['Jon Snow','Tyrion Lannister','Samwell Tarly','Varys'],1],
+['Qual destes animais representa a Casa Stark?',['Leão','Lobo gigante','Dragão','Cervo'],1],
+['Daenerys é famosa principalmente por seus…',['Lobos','Corvos','Dragões','Cavalos'],2],
+['Qual cidade abriga o Trono de Ferro durante grande parte da série?',['Winterfell','Braavos','King’s Landing','Oldtown'],2]
+],
+'friends':[
+['Onde a turma vive tomando café?',['Central Perk','Monk’s Café','Luke’s Diner','MacLaren’s'],0],
+['Qual personagem é famoso por “How you doin’?”',['Ross','Chandler','Joey','Gunther'],2],
+['Qual instrumento Phoebe costuma tocar?',['Piano','Violão','Bateria','Violino'],1],
+['Qual é a profissão de Ross?',['Chef','Paleontólogo','Ator','Advogado'],1],
+['Quem é irmã de Ross?',['Rachel','Phoebe','Monica','Janice'],2]
+],
+'link click':[
+['Qual objeto está no centro de muitas viagens da história?',['Fotografias','Livros','Espelhos','Relógios'],0],
+['Quem trabalha ao lado de Cheng Xiaoshi?',['Lu Guang','Qiao Ling','Xiao Li','Liu Min'],0],
+['A habilidade principal da dupla envolve…',['Viajar por fotografias','Ler pensamentos','Controlar sonhos','Ficar invisível'],0],
+['Qual ideia é importante para evitar consequências perigosas?',['Mudar tudo','Seguir regras','Ignorar o tempo','Esquecer as fotos'],1],
+['O clima da série mistura mistério principalmente com…',['Viagens no tempo','Piratas','Esportes','Culinária'],0]
+]};
+const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+function generic(name){return [
+[`Pergunta importantíssima: depois de terminar ${name}, qual diagnóstico parece mais provável?`,['“Só mais uma série”','Vou dormir cedo para sempre','Nunca mais vejo TV','Esqueci que assisti'],0],
+[`Você chegou ao último episódio de ${name}. Isso oficialmente significa…`,['Missão cumprida 🏆','Que faltam 12 temporadas','Que voltou ao episódio 1','Que o controle remoto venceu'],0],
+['Durante uma maratona, qual frase é historicamente suspeita?',['“Só mais um episódio”','“Vou beber água”','“Onde está o controle?”','“A TV está ligada?”'],0],
+[`Se alguém perguntar se você realmente terminou ${name}, a resposta correta é…`,['“Sim, sobrevivi 😂”','“Que série?”','“Ainda estou no trailer”','“Só vi os créditos”'],0],
+['Qual prêmio combina mais com quem chegou até aqui?',['Troféu imaginário de maratona 🏆','Uma prova de matemática','Um boleto surpresa','Reiniciar o Wi-Fi'],0]
+]}
+function getQuiz(name){const n=norm(name);for(const k in Q)if(n.includes(k))return Q[k];return generic(name)}
+function ensure(){if(document.getElementById('quizModal'))return;document.body.insertAdjacentHTML('beforeend',`<div id="quizModal" class="quiz-modal"><div class="quiz-card"><button id="quizClose" class="moment-close">×</button><small>DESAFIO FINAL 😂</small><h2 id="quizTitle">Você prestou atenção?</h2><p id="quizIntro"></p><div id="quizBody"></div></div></div>`);document.getElementById('quizClose').onclick=()=>document.getElementById('quizModal').classList.remove('open')}
+function start(name){ensure();const modal=document.getElementById('quizModal'),body=document.getElementById('quizBody'),qs=getQuiz(name);let i=0,score=0;document.getElementById('quizIntro').textContent=`Terminou ${name}… mas assistiu mesmo ou ficou no celular? 👀😂`;modal.classList.add('open');function draw(){if(i>=qs.length){let msg=score===5?'Tá bom, tá bom… você REALMENTE assistiu. 😂🏆':score>=3?'Passou! Mas teve umas piscadas suspeitas no meio. 👀😂':score>=1?'Você assistiu ou só estava no mesmo cômodo que a TV? 😂':'🚨 Investigação aberta: fortes indícios de cochilo durante a série. 😂';body.innerHTML=`<div class="quiz-result"><div class="quiz-score">${score}/5</div><h3>${msg}</h3><button id="quizDone">Encerrar interrogatório 😂</button></div>`;document.getElementById('quizDone').onclick=()=>modal.classList.remove('open');return}const q=qs[i];body.innerHTML=`<div class="quiz-count">Pergunta ${i+1} de ${qs.length}</div><h3 class="quiz-question">${q[0]}</h3><div class="quiz-options">${q[1].map((x,j)=>`<button data-a="${j}">${x}</button>`).join('')}</div><div id="quizFeedback"></div>`;body.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const chosen=+b.dataset.a,ok=chosen===q[2];if(ok)score++;body.querySelectorAll('[data-a]').forEach((x,j)=>{x.disabled=true;if(j===q[2])x.classList.add('right');else if(j===chosen)x.classList.add('wrong')});document.getElementById('quizFeedback').innerHTML=`<p>${ok?'Acertou! 👀😂 Tava prestando atenção mesmo.':'Hmmm… suspeito. 😂 A resposta era: '+q[1][q[2]]}</p><button id="quizContinue">${i===qs.length-1?'Ver meu veredito 😂':'Próxima fofoca →'}</button>`;document.getElementById('quizContinue').onclick=()=>{i++;draw()}})}draw()}
+window.sayureFinalQuiz={start};
+function hook(){const next=document.getElementById('momentNext'),title=document.getElementById('momentTitle'),meta=document.getElementById('momentMeta');if(!next||next.dataset.quizHook)return;next.dataset.quizHook='1';next.addEventListener('click',e=>{if(title&&/Série concluída|Series complete/i.test(title.textContent)){e.stopImmediatePropagation();document.getElementById('momentModal')?.classList.remove('open');const name=(meta?.textContent||'').split(' • ')[0]||'esta série';setTimeout(()=>start(name),180)}},true)}
+const obs=new MutationObserver(hook);function init(){hook();const m=document.getElementById('momentModal');if(m)obs.observe(m,{attributes:true,subtree:true,childList:true})}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
