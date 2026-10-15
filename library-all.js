@@ -3,6 +3,7 @@ const STORE='sayure-library-v3';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function items(){try{return JSON.parse(localStorage.getItem(STORE)||'[]')}catch(_){return[]}}
+function setNav(active){document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b===active))}
 function renderAll(){
  const box=$('#watchlist'),empty=$('#empty'),count=$('#count');if(!box||!empty||!count)return;
  const list=items(),pt=document.documentElement.lang!=='en';
@@ -18,6 +19,12 @@ function renderAll(){
  });
  $('#continueSection')?.scrollIntoView({behavior:'smooth'});
 }
-function init(){const nav=$('#navList');if(!nav)return;nav.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();renderAll()},true)}
+function init(){
+ const navList=$('#navList'),navHome=$('#navHome'),navSearch=$('#navSearch');if(!navList)return;
+ navList.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();setNav(navList);renderAll()},true);
+ navHome?.addEventListener('click',()=>setNav(navHome),true);
+ navSearch?.addEventListener('click',()=>setNav(navSearch),true);
+ document.querySelectorAll('.filter').forEach(b=>b.addEventListener('click',()=>setNav(navList),true));
+}
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init):init();
 })();
