@@ -18,7 +18,7 @@ async function loadAuthorizedUsers(){
   if(!confirm('Remover o acesso de '+email+'? Essa pessoa deixará de poder usar o Sayure TV.'))return;
   btn.disabled=true;
   try{const {error}=await client.rpc('revoke_user_access',{target_user_id:id});if(error)throw error;await loadAuthorizedUsers();alert('Acesso removido. A conta não poderá mais acessar a biblioteca.')}
-  catch(err){console.error('Sayure revoke access',err);alert('Não foi possível remover o acesso. Confirme se a atualização SQL foi aplicada no Supabase.')}
+  catch(err){console.error('Sayure revoke access',err);const detail=err&&err.message?err.message:'Erro desconhecido';alert('Não foi possível remover o acesso: '+detail)}
   finally{btn.disabled=false}
  }));
 }
