@@ -3,7 +3,7 @@
 const TMDB='https://api.themoviedb.org/3';
 const GIPHY='https://api.giphy.com/v1/gifs/search';
 const ALLOWED=['/search/multi','/trending/all/week','/movie/popular','/tv/popular','/discover/tv'];
-const cors={'Access-Control-Allow-Origin':'https://alissonbueno2023.github.io','Access-Control-Allow-Methods':'GET,OPTIONS','Access-Control-Allow-Headers':'Content-Type'};
+const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,OPTIONS','Access-Control-Allow-Headers':'Content-Type'};
 export default {async fetch(request,env){
  if(request.method==='OPTIONS')return new Response(null,{headers:cors});
  if(request.method!=='GET')return json({error:'Method not allowed'},405);
