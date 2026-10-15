@@ -1,4 +1,4 @@
-const CACHE='sayure-tv-v19';
+const CACHE='sayure-tv-v20';
 const SHELL=['./','./index.html','./style.css?v=9','./access-ui.css?v=2','./responsive-v1.css?v=2','./app.js?v=6','./supabase-config.js?v=8','./auth-sync.js?v=10','./avatar-profile.js?v=2','./sayure-moments.js?v=2','./sayure-progress.js?v=1','./sayure-quiz.js?v=9','./sayure-profile.js?v=2','./access-waiting.js?v=1','./library-all.js?v=2','./pwa.js?v=3','./manifest.json','./sayure-icon.svg','./access-admin.js?v=2'];
 self.addEventListener('install',event=>{self.skipWaiting();event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).catch(()=>{}));});
 self.addEventListener('activate',event=>{event.waitUntil(Promise.all([self.clients.claim(),caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))]));});
