@@ -38,7 +38,7 @@ begin
   end if;
 
   update public.access_profiles
-  set status = 'rejected', approved_at = null, approved_by = auth.uid()
+  set status = 'rejected'
   where user_id = target_user_id;
 end;
 $$;
