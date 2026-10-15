@@ -1,0 +1,14 @@
+(()=>{
+'use strict';
+const BUCKET='avatars';
+function el(id){return document.getElementById(id)}
+function sb(){return window.sayureSupabase||null}
+function initials(user){return user&&user.email?user.email.charAt(0).toUpperCase():'S'}
+function avatarNodes(){return [el('account'),document.querySelector('.account-avatar')].filter(Boolean)}
+function setAvatar(url,user){avatarNodes().forEach(node=>{node.textContent=url?'':initials(user);node.style.backgroundImage=url?`url("${url}")`:'';node.classList.toggle('has-photo',!!url)})}
+async function currentUser(){const client=sb();if(!client)return null;const {data}=await client.auth.getUser();return data&&data.user||null}
+async function loadAvatar(){const client=sb(),user=await currentUser();if(!client||!user)return;const path=`${user.id}/avatar.jpg`;const {data}=client.storage.from(BUCKET).getPublicUrl(path);const base=data&&data.publicUrl;if(!base){setAvatar('',user);return}try{const res=await fetch(`${base}?v=${Date.now()}`,{method:'HEAD',cache:'no-store'});setAvatar(res.ok?`${base}?v=${Date.now()}`:'',user)}catch(_){setAvatar('',user)}}
+async function uploadAvatar(file){const client=sb(),user=await currentUser(),status=el('avatarMessage'),btn=el('chooseAvatar');if(!client||!user||!file)return;if(!file.type.startsWith('image/')){if(status)status.textContent='Escolha uma imagem.';return}if(file.size>5*1024*1024){if(status)status.textContent='A foto deve ter no máximo 5 MB.';return}if(status)status.textContent='Enviando foto...';if(btn)btn.disabled=true;try{const path=`${user.id}/avatar.jpg`;const {error}=await client.storage.from(BUCKET).upload(path,file,{upsert:true,contentType:file.type,cacheControl:'3600'});if(error)throw error;const {data}=client.storage.from(BUCKET).getPublicUrl(path);setAvatar(`${data.publicUrl}?v=${Date.now()}`,user);if(status)status.textContent='Foto atualizada ✓'}catch(err){console.error('Sayure avatar',err);if(status)status.textContent='Não foi possível enviar a foto.'}finally{if(btn)btn.disabled=false}}
+function init(){const input=el('avatarInput'),btn=el('chooseAvatar');btn&&btn.addEventListener('click',()=>input&&input.click());input&&input.addEventListener('change',()=>{const file=input.files&&input.files[0];if(file)uploadAvatar(file);input.value=''});const client=sb();if(client){client.auth.onAuthStateChange((_event,session)=>{if(session&&session.user)setTimeout(loadAvatar,100);else setAvatar('',null)});client.auth.getSession().then(({data})=>{if(data&&data.session)loadAvatar()})}}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
