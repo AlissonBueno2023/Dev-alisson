@@ -21,15 +21,17 @@ export default {async fetch(request,env){
 async function gifReaction(u,env,cors){
  if(!env.GIPHY_KEY)return json({error:'GIPHY_KEY not configured'},503,cors);
  const title=(u.searchParams.get('title')||'').trim().slice(0,100);
- const mood=u.searchParams.get('mood')==='bad'?'bad':'good';
+ const requested=u.searchParams.get('mood');
+ const mood=requested==='waiting'?'waiting':requested==='bad'?'bad':'good';
  if(!title)return json({error:'Missing title'},400,cors);
  const good=['happy reaction','celebration reaction','excited reaction','yes reaction','win reaction'];
  const bad=['funny fail reaction','disappointed reaction','confused reaction','facepalm reaction','shocked reaction'];
- const moods=mood==='good'?good:bad;
+ const waiting=['funny waiting reaction','waiting patiently funny','still waiting reaction','impatient waiting funny','bored waiting reaction'];
+ const moods=mood==='waiting'?waiting:mood==='good'?good:bad;
  const query=`${title} ${moods[Math.floor(Math.random()*moods.length)]}`;
  try{
   let items=await giphySearch(query,env.GIPHY_KEY);
-  if(!items.length)items=await giphySearch(mood==='good'?'happy celebration reaction':'funny fail reaction',env.GIPHY_KEY);
+  if(!items.length)items=await giphySearch(mood==='waiting'?'funny waiting reaction':mood==='good'?'happy celebration reaction':'funny fail reaction',env.GIPHY_KEY);
   if(!items.length)return json({gif:null},{status:200,cache:'no-store',cors});
   const pool=items.slice(0,Math.min(items.length,15));
   const g=pool[Math.floor(Math.random()*pool.length)];
